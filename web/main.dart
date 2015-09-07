@@ -34,9 +34,9 @@ void move(int square) {
   String littleBoardWinner = littleBoards[currentBoard].move(square, currentPlayer);
 
   if (littleBoardWinner != null) {
-    String mainBoardWin = mainBoard.move(currentBoard, littleBoardWinner);
+    String mainBoardWinner = mainBoard.move(currentBoard, littleBoardWinner);
 
-    if (mainBoard != null) {
+    if (mainBoardWinner != null) {
       // PLAYER 'currentPlayer' WINS!
       // return and end the game
     }
