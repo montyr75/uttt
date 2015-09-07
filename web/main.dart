@@ -31,14 +31,18 @@ void setUpNextMove() {
 // called by mouse click
 // 'square' is the little square clicked (0-8)
 void move(int square) {
+  // TODO: Put currentPlayer into little board DOM
+
   String littleBoardWinner = littleBoards[currentBoard].move(square, currentPlayer);
 
   if (littleBoardWinner != null) {
     String mainBoardWinner = mainBoard.move(currentBoard, littleBoardWinner);
 
+    // TODO: Put littleBoardWinner into main board DOM
+
     if (mainBoardWinner != null) {
-      // PLAYER 'currentPlayer' WINS!
-      // return and end the game
+      // TODO: PLAYER currentPlayer WINS!
+      // TODO: return and end the game
     }
   }
 
