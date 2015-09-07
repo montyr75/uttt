@@ -1,18 +1,56 @@
 import 'dart:html';
 
+List<TTTBoard> littleBoards;    // a list of all 9 small TTT boards
+TTTBoard mainBoard;             // the large TTT board
+String currentPlayer;           // "X" or "O"
+int currentBoard;               // small TTT board for next move (0-8)
+
 void main() {
-  TTTBoard board = new TTTBoard();
+  newGame();
+}
 
-  print('Winner: ${board.move(4, "X") ?? "none"}');
-  print('Winner: ${board.move(0, "X") ?? "none"}');
-  print('Winner: ${board.move(8, "X") ?? "none"}');
+void newGame() {
+  // TODO: If the HTML gets too ugly, consider building the board in code here.
 
-  print(board);
+  littleBoards = new List<TTTBoard>.generate(9, (_) => new TTTBoard());
+  mainBoard = new TTTBoard();
+  currentPlayer = null;
+  currentBoard = null;
+
+  setUpNextMove();
+}
+
+void setUpNextMove() {
+  currentPlayer = currentPlayer == "X" ? "O" : "X";
+
+  // TODO: Listen for clicks only on unoccupied squares in currentBoard (they call move())
+  // TODO: If currentBoard is null, listen on ALL unoccupied squares in unoccupied mainBoard squares
+  // TODO: Mark all valid squares with CSS
+}
+
+// called by mouse click
+// 'square' is the little square clicked (0-8)
+void move(int square) {
+  String littleBoardWinner = littleBoards[currentBoard].move(square, currentPlayer);
+
+  if (littleBoardWinner != null) {
+    String mainBoardWin = mainBoard.move(currentBoard, littleBoardWinner);
+
+    if (mainBoard != null) {
+      // PLAYER 'currentPlayer' WINS!
+      // return and end the game
+    }
+  }
+
+  // if mainBoard[square] is unoccupied, set it as currentBoard
+  currentBoard = mainBoard[square] == null ? square : null;
+
+  setUpNextMove();
 }
 
 class TTTBoard {
   // win patterns
-  final List<List<int>> _winPatterns = const [
+  static const List<List<int>> WIN_PATTERNS = const [
     const [0, 1, 2],  // row 1
     const [3, 4, 5],  // row 2
     const [6, 7, 8],  // row 3
@@ -35,7 +73,7 @@ class TTTBoard {
   }
 
   String checkWin() {
-    for (List<int> winPattern in _winPatterns) {
+    for (List<int> winPattern in WIN_PATTERNS) {
       String square1 = _board[winPattern[0]];
       String square2 = _board[winPattern[1]];
       String square3 = _board[winPattern[2]];
@@ -49,6 +87,8 @@ class TTTBoard {
     // if we get here, there is no win
     return null;
   }
+
+  String operator [](int square) => _board[square];
 
   @override String toString() {
     String mark(int square) {
