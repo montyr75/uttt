@@ -1,44 +1,76 @@
 import 'dart:html';
+import 'dart:async';
 
 List<TTTBoard> littleBoards;    // a list of all 9 small TTT boards
 TTTBoard mainBoard;             // the large TTT board
 String currentPlayer;           // "X" or "O"
-int currentBoard;               // small TTT board for next move (0-8)
+List<int> currentMainSquares;   // small TTT board(s) for next move (0-8)
+Map<DivElement, StreamSubscription> currentLittleSquares;
 
 void main() {
+  // TODO: If the HTML gets too ugly, consider building the board in code here.
+
   newGame();
 }
 
 void newGame() {
-  // TODO: If the HTML gets too ugly, consider building the board in code here.
-
   littleBoards = new List<TTTBoard>.generate(9, (_) => new TTTBoard());
   mainBoard = new TTTBoard();
   currentPlayer = null;
-  currentBoard = null;
+  currentMainSquares = [];
+  currentLittleSquares = {};
 
+  calculateCurrentMainSquares();
   setUpNextMove();
 }
 
 void setUpNextMove() {
+  // toggle current player
   currentPlayer = currentPlayer == "X" ? "O" : "X";
 
-  // TODO: Listen for clicks only on unoccupied squares in currentBoard (they call move())
-  // TODO: If currentBoard is null, listen on ALL unoccupied squares in unoccupied mainBoard squares
-  // TODO: Mark all valid squares with CSS
+  // find, save, and highlight all legal moves (little squares)
+  for (int mainSquare in currentMainSquares) {
+    List<int> littleSquares = littleBoards[mainSquare].unoccupiedSquares;
+
+    for (int littleSquare in littleSquares) {
+      DivElement squareDiv = getLittleSquareDiv(mainSquare, littleSquare);
+      currentLittleSquares[squareDiv] = squareDiv.onClick.listen((MouseEvent event) => move(mainSquare, littleSquare));
+      squareDiv.classes.toggle("current-square");
+    }
+  }
+}
+
+void calculateCurrentMainSquares([int lastLittleSquare]) {
+  currentMainSquares.clear();
+
+  if (lastLittleSquare != null && mainBoard[lastLittleSquare] == null) {
+    currentMainSquares.add(lastLittleSquare);
+  }
+  else {
+    currentMainSquares = mainBoard.unoccupiedSquares;
+  }
 }
 
 // called by mouse click
-// 'square' is the little square clicked (0-8)
-void move(int square) {
-  // TODO: Put currentPlayer into little board DOM
+void move(int mainSquare, int littleSquare) {
+  // remove click listeners from last turn
+  currentLittleSquares.forEach((DivElement squareDiv, StreamSubscription listener) {
+    squareDiv.classes.toggle("current-square");
+    listener.cancel();
+  });
 
-  String littleBoardWinner = littleBoards[currentBoard].move(square, currentPlayer);
+  currentLittleSquares.clear();
+
+  getLittleSquareDiv(mainSquare, littleSquare).text = currentPlayer;
+
+  String littleBoardWinner = littleBoards[mainSquare].move(littleSquare, currentPlayer);
 
   if (littleBoardWinner != null) {
-    String mainBoardWinner = mainBoard.move(currentBoard, littleBoardWinner);
+    String mainBoardWinner = mainBoard.move(mainSquare, littleBoardWinner);
 
-    // TODO: Put littleBoardWinner into main board DOM
+    DivElement mainSquareDiv = getMainSquareDiv(mainSquare);
+    mainSquareDiv.children.clear();
+    mainSquareDiv.appendHtml('<span class="main-mark">$littleBoardWinner</span>');
 
     if (mainBoardWinner != null) {
       // TODO: PLAYER currentPlayer WINS!
@@ -46,10 +78,16 @@ void move(int square) {
     }
   }
 
-  // if mainBoard[square] is unoccupied, set it as currentBoard
-  currentBoard = mainBoard[square] == null ? square : null;
-
+  calculateCurrentMainSquares(littleSquare);
   setUpNextMove();
+}
+
+DivElement getMainSquareDiv(int mainSquare) {
+  return querySelector('.main-square[data-square="$mainSquare"]');
+}
+
+DivElement getLittleSquareDiv(int mainSquare, int littleSquare) {
+  return querySelector('.main-square[data-square="$mainSquare"] .little-square[data-square="$littleSquare"]');
 }
 
 class TTTBoard {
@@ -90,6 +128,18 @@ class TTTBoard {
 
     // if we get here, there is no win
     return null;
+  }
+
+  List<int> get unoccupiedSquares {
+    List<int> squares = [];
+
+    for (int i = 0; i < _board.length; i++) {
+      if (_board[i] == null) {
+        squares.add(i);
+      }
+    }
+
+    return squares;
   }
 
   String operator [](int square) => _board[square];
