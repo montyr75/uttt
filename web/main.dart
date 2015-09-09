@@ -61,7 +61,7 @@ void findAvailableSquares([int lastLittleSquare]) {
     availableMainSquares = mainBoard.unoccupiedSquares;
   }
 
-  // find, save, and highlight all legal moves (little squares)
+  // find, save, and highlight all available little squares
   for (int mainSquare in availableMainSquares) {
     List<int> littleSquares = littleBoards[mainSquare].unoccupiedSquares;
 
@@ -80,23 +80,22 @@ void findAvailableSquares([int lastLittleSquare]) {
   }
 }
 
-void clearAvailableLittleSquares() {
-  // remove click listeners from last turn
-  availableLittleSquares.forEach((DivElement squareDiv, StreamSubscription listener) {
-    squareDiv.classes.toggle("current-square");
-    listener.cancel();
-  });
-
-  availableLittleSquares.clear();
-}
-
 void move(int mainSquare, int littleSquare) {
-  clearAvailableLittleSquares();
+  // remove click listeners from last turn
+  availableLittleSquares
+    ..forEach((DivElement squareDiv, StreamSubscription listener) {
+        squareDiv.classes.toggle("current-square");
+        listener.cancel();
+    })
+    ..clear();
 
+  // mark the square
   getLittleSquareDiv(mainSquare, littleSquare).text = currentPlayer;
 
+  // make the move
   String littleBoardWinner = littleBoards[mainSquare].move(littleSquare, currentPlayer);
 
+  // if there is a win on a little board, make a move on the main board
   if (littleBoardWinner != null) {
     String mainBoardWinner = mainBoard.move(mainSquare, littleBoardWinner);
 
@@ -104,9 +103,13 @@ void move(int mainSquare, int littleSquare) {
     mainSquareDiv.children.clear();
     mainSquareDiv.appendHtml('<span class="main-mark">$littleBoardWinner</span>');
 
+    // check for win
     if (mainBoardWinner != null) {
-      clearAvailableLittleSquares();
       messageDiv.text = "Player $mainBoardWinner wins!";
+      return;
+    }
+    else if (mainBoard._moveCount >= 9) {
+      messageDiv.text = "It's a tie!";
       return;
     }
   }
@@ -137,12 +140,15 @@ class TTTBoard {
 
   List<String> _board;
 
+  int _moveCount = 0;
+
   TTTBoard() {
     _board = new List<String>.filled(9, null);
   }
 
   String move(int square, String player) {
     _board[square] = player;
+    _moveCount++;
     return checkWin();
   }
 
@@ -173,6 +179,8 @@ class TTTBoard {
 
     return squares;
   }
+
+  int get moveCount => _moveCount;
 
   String operator [](int square) => _board[square];
 
