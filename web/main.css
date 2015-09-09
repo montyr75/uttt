@@ -1,4 +1,6 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto);
+/*@import url("https://goo.gl/oE27os");*/
+
+@import url("https://fonts.googleapis.com/css?family=Roboto");
 
 html, body {
   width: 100vw;
@@ -14,13 +16,6 @@ html, body {
   cursor: default;
 }
 
-#main-board {
-  width: 449px;
-  height: 449px;
-  border: solid thin black;
-  box-sizing: border-box;
-}
-
 #toolbar {
   width: 449px;
   padding: 20px 0;
@@ -30,9 +25,15 @@ html, body {
   font-size: 0.8em;
 }
 
+#main-board {
+  width: 450px;
+  height: 450px;
+  box-sizing: border-box;
+}
+
 .main-square {
-  width: 149px;
-  height: 149px;
+  width: 150px;
+  height: 150px;
   border: solid thin black;
   box-sizing: border-box;
 }
@@ -44,7 +45,7 @@ html, body {
   box-sizing: border-box;
 }
 
-.current-square {
+.available-square {
   background-color: lightblue;
 }
 
