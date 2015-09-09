@@ -8,36 +8,45 @@ List<int> currentMainSquares;   // small TTT board(s) for next move (0-8)
 Map<DivElement, StreamSubscription> currentLittleSquares;
 
 void main() {
-  // TODO: If the HTML gets too ugly, consider building the board in code here.
-
   newGame();
 }
 
-void newGame() {
+void newGame([MouseEvent event]) {
   littleBoards = new List<TTTBoard>.generate(9, (_) => new TTTBoard());
   mainBoard = new TTTBoard();
   currentPlayer = null;
   currentMainSquares = [];
   currentLittleSquares = {};
 
-  calculateCurrentMainSquares();
-  setUpNextMove();
+  createBoard();
+  nextTurn();
 }
 
-void setUpNextMove() {
+void createBoard() {
+  DivElement mainBoardDiv = querySelector("#main-board")..children.clear();
+  for (int mainSquare = 0; mainSquare < 9; mainSquare++) {
+    DivElement mainSquareDiv = new DivElement()
+      ..classes.addAll(["main-square", "layout", "horizontal", "center", "center-justified", "wrap"])
+      ..attributes['data-square'] = mainSquare.toString();
+
+    mainBoardDiv.append(mainSquareDiv);
+
+    for (int littleSquare = 0; littleSquare < 9; littleSquare++) {
+      mainSquareDiv.append(new DivElement()
+        ..classes.addAll(["little-square", "layout", "horizontal", "center", "center-justified"])
+        ..attributes['data-square'] = littleSquare.toString());
+    }
+  }
+
+  querySelector("#new-game-btn").onClick.listen(newGame);
+}
+
+void nextTurn([int lastLittleSquare]) {
   // toggle current player
   currentPlayer = currentPlayer == "X" ? "O" : "X";
 
-  // find, save, and highlight all legal moves (little squares)
-  for (int mainSquare in currentMainSquares) {
-    List<int> littleSquares = littleBoards[mainSquare].unoccupiedSquares;
-
-    for (int littleSquare in littleSquares) {
-      DivElement squareDiv = getLittleSquareDiv(mainSquare, littleSquare);
-      currentLittleSquares[squareDiv] = squareDiv.onClick.listen((MouseEvent event) => move(mainSquare, littleSquare));
-      squareDiv.classes.toggle("current-square");
-    }
-  }
+  calculateCurrentMainSquares(lastLittleSquare);
+  calculateCurrentLittleSquares();
 }
 
 void calculateCurrentMainSquares([int lastLittleSquare]) {
@@ -51,8 +60,26 @@ void calculateCurrentMainSquares([int lastLittleSquare]) {
   }
 }
 
-// called by mouse click
-void move(int mainSquare, int littleSquare) {
+void calculateCurrentLittleSquares() {
+  // find, save, and highlight all legal moves (little squares)
+  for (int mainSquare in currentMainSquares) {
+    List<int> littleSquares = littleBoards[mainSquare].unoccupiedSquares;
+
+    for (int littleSquare in littleSquares) {
+      DivElement squareDiv = getLittleSquareDiv(mainSquare, littleSquare);
+      currentLittleSquares[squareDiv] = squareDiv.onClick.listen((MouseEvent event) => move(mainSquare, littleSquare));
+      squareDiv.classes.toggle("current-square");
+    }
+  }
+
+  // if the player has nowhere to move in the target main square, he/she can move anywhere
+  if (currentLittleSquares.isEmpty) {
+    calculateCurrentMainSquares();
+    calculateCurrentLittleSquares();
+  }
+}
+
+void clearCurrentLittleSquares() {
   // remove click listeners from last turn
   currentLittleSquares.forEach((DivElement squareDiv, StreamSubscription listener) {
     squareDiv.classes.toggle("current-square");
@@ -60,6 +87,11 @@ void move(int mainSquare, int littleSquare) {
   });
 
   currentLittleSquares.clear();
+}
+
+// called by mouse click
+void move(int mainSquare, int littleSquare) {
+  clearCurrentLittleSquares();
 
   getLittleSquareDiv(mainSquare, littleSquare).text = currentPlayer;
 
@@ -73,13 +105,14 @@ void move(int mainSquare, int littleSquare) {
     mainSquareDiv.appendHtml('<span class="main-mark">$littleBoardWinner</span>');
 
     if (mainBoardWinner != null) {
-      // TODO: PLAYER currentPlayer WINS!
+      // TODO: PLAYER mainBoardWinner WINS!
       // TODO: return and end the game
+      clearCurrentLittleSquares();
+      return;
     }
   }
 
-  calculateCurrentMainSquares(littleSquare);
-  setUpNextMove();
+  nextTurn(littleSquare);
 }
 
 DivElement getMainSquareDiv(int mainSquare) {

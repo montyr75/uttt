@@ -5,154 +5,18 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="scaffolded-by" content="https://github.com/google/stagehand">
   <title>Ultimate Tic-Tac-Toe</title>
   <link rel="import" href="https://cdn.rawgit.com/download/polymer-cdn/1.0.1/lib/iron-flex-layout/classes/iron-flex-layout.html">
   <link rel="stylesheet" href="styles.css">
   <script async src="main.dart" type="application/dart"></script>
   <script async src="packages/browser/dart.js"></script>
-
-  <style>
-    html, body {
-      width: 100vw;
-      height: 100vh;
-      font-size: 2em;
-    }
-
-    #main-board {
-      width: 602px;
-      height: 602px;
-      margin: auto;
-      border: solid thin black;
-      box-sizing: border-box;
-      cursor: default;
-    }
-
-    .main-square {
-      width: 200px;
-      height: 200px;
-      border: solid thin blue;
-      box-sizing: border-box;
-    }
-
-    .little-square {
-      width: 66px;
-      height: 66px;
-      border: solid thin red;
-      box-sizing: border-box;
-    }
-
-    .current-square {
-      background-color: lightblue;
-    }
-
-    .main-mark {
-      font-size: 3em;
-    }
-  </style>
 </head>
 
-<body class="layout horizontal center center-justified">
-  <div id="main-board" class="layout horizontal wrap">
-    <div class="main-square layout horizontal center center-justified wrap" data-square="0">
-      <div class="little-square layout horizontal center center-justified" data-square="0"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="1"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="2"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="3"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="4"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="5"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="6"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="7"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="8"></div>
-    </div>
-    <div class="main-square layout horizontal center center-justified wrap" data-square="1">
-      <div class="little-square layout horizontal center center-justified" data-square="0"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="1"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="2"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="3"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="4"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="5"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="6"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="7"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="8"></div>
-    </div>
-    <div class="main-square layout horizontal center center-justified wrap" data-square="2">
-      <div class="little-square layout horizontal center center-justified" data-square="0"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="1"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="2"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="3"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="4"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="5"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="6"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="7"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="8"></div>
-    </div>
-    <div class="main-square layout horizontal center center-justified wrap" data-square="3">
-      <div class="little-square layout horizontal center center-justified" data-square="0"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="1"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="2"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="3"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="4"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="5"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="6"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="7"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="8"></div>
-    </div>
-    <div class="main-square layout horizontal center center-justified wrap" data-square="4">
-      <div class="little-square layout horizontal center center-justified" data-square="0"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="1"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="2"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="3"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="4"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="5"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="6"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="7"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="8"></div>
-    </div>
-    <div class="main-square layout horizontal center center-justified wrap" data-square="5">
-      <div class="little-square layout horizontal center center-justified" data-square="0"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="1"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="2"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="3"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="4"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="5"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="6"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="7"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="8"></div>
-    </div>
-    <div class="main-square layout horizontal center center-justified wrap" data-square="6">
-      <div class="little-square layout horizontal center center-justified" data-square="0"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="1"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="2"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="3"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="4"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="5"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="6"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="7"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="8"></div>
-    </div>
-    <div class="main-square layout horizontal center center-justified wrap" data-square="7">
-      <div class="little-square layout horizontal center center-justified" data-square="0"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="1"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="2"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="3"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="4"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="5"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="6"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="7"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="8"></div>
-    </div>
-    <div class="main-square layout horizontal center center-justified wrap" data-square="8">
-      <div class="little-square layout horizontal center center-justified" data-square="0"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="1"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="2"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="3"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="4"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="5"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="6"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="7"></div>
-      <div class="little-square layout horizontal center center-justified" data-square="8"></div>
-    </div>
+<body class="layout vertical center center-justified">
+  <div id="toolbar">
+    <button id="new-game-btn">New Game</button>
   </div>
+
+  <div id="main-board" class="layout horizontal wrap"></div>
 </body>
 </html>
