@@ -1,22 +1,25 @@
 import 'dart:html';
 import 'dart:async';
 
-List<TTTBoard> littleBoards;    // a list of all 9 small TTT boards
-TTTBoard mainBoard;             // the large TTT board
-String currentPlayer;           // "X" or "O"
-List<int> currentMainSquares;   // small TTT board(s) for next move (0-8)
-Map<DivElement, StreamSubscription> currentLittleSquares;
+TTTBoard mainBoard;               // the large TTT board
+List<TTTBoard> littleBoards;      // a list of all 9 small TTT boards
+String currentPlayer;             // "X" or "O"
+List<int> availableMainSquares;   // main squares available for next move
+Map<DivElement, StreamSubscription> availableLittleSquares;
+
+DivElement messageDiv = querySelector("#message");
 
 void main() {
+  querySelector("#new-game-btn").onClick.listen(newGame);
   newGame();
 }
 
 void newGame([MouseEvent event]) {
-  littleBoards = new List<TTTBoard>.generate(9, (_) => new TTTBoard());
   mainBoard = new TTTBoard();
+  littleBoards = new List<TTTBoard>.generate(9, (_) => new TTTBoard());
   currentPlayer = null;
-  currentMainSquares = [];
-  currentLittleSquares = {};
+  availableMainSquares = [];
+  availableLittleSquares = {};
 
   createBoard();
   nextTurn();
@@ -37,61 +40,58 @@ void createBoard() {
         ..attributes['data-square'] = littleSquare.toString());
     }
   }
-
-  querySelector("#new-game-btn").onClick.listen(newGame);
 }
 
 void nextTurn([int lastLittleSquare]) {
   // toggle current player
   currentPlayer = currentPlayer == "X" ? "O" : "X";
+  messageDiv.text = "Player: $currentPlayer";
 
-  calculateCurrentMainSquares(lastLittleSquare);
-  calculateCurrentLittleSquares();
+  findAvailableSquares(lastLittleSquare);
 }
 
-void calculateCurrentMainSquares([int lastLittleSquare]) {
-  currentMainSquares.clear();
+void findAvailableSquares([int lastLittleSquare]) {
+  // figure out which main squares are available
+  availableMainSquares.clear();
 
   if (lastLittleSquare != null && mainBoard[lastLittleSquare] == null) {
-    currentMainSquares.add(lastLittleSquare);
+    availableMainSquares.add(lastLittleSquare);
   }
   else {
-    currentMainSquares = mainBoard.unoccupiedSquares;
+    availableMainSquares = mainBoard.unoccupiedSquares;
   }
-}
 
-void calculateCurrentLittleSquares() {
   // find, save, and highlight all legal moves (little squares)
-  for (int mainSquare in currentMainSquares) {
+  for (int mainSquare in availableMainSquares) {
     List<int> littleSquares = littleBoards[mainSquare].unoccupiedSquares;
 
     for (int littleSquare in littleSquares) {
       DivElement squareDiv = getLittleSquareDiv(mainSquare, littleSquare);
-      currentLittleSquares[squareDiv] = squareDiv.onClick.listen((MouseEvent event) => move(mainSquare, littleSquare));
       squareDiv.classes.toggle("current-square");
+      availableLittleSquares[squareDiv] = squareDiv.onClick.listen(
+        (MouseEvent event) => move(mainSquare, littleSquare)
+      );
     }
   }
 
-  // if the player has nowhere to move in the target main square, he/she can move anywhere
-  if (currentLittleSquares.isEmpty) {
-    calculateCurrentMainSquares();
-    calculateCurrentLittleSquares();
+  // if the player has nowhere to move, he/she can move anywhere
+  if (availableLittleSquares.isEmpty) {
+    findAvailableSquares();
   }
 }
 
-void clearCurrentLittleSquares() {
+void clearAvailableLittleSquares() {
   // remove click listeners from last turn
-  currentLittleSquares.forEach((DivElement squareDiv, StreamSubscription listener) {
+  availableLittleSquares.forEach((DivElement squareDiv, StreamSubscription listener) {
     squareDiv.classes.toggle("current-square");
     listener.cancel();
   });
 
-  currentLittleSquares.clear();
+  availableLittleSquares.clear();
 }
 
-// called by mouse click
 void move(int mainSquare, int littleSquare) {
-  clearCurrentLittleSquares();
+  clearAvailableLittleSquares();
 
   getLittleSquareDiv(mainSquare, littleSquare).text = currentPlayer;
 
@@ -105,9 +105,8 @@ void move(int mainSquare, int littleSquare) {
     mainSquareDiv.appendHtml('<span class="main-mark">$littleBoardWinner</span>');
 
     if (mainBoardWinner != null) {
-      // TODO: PLAYER mainBoardWinner WINS!
-      // TODO: return and end the game
-      clearCurrentLittleSquares();
+      clearAvailableLittleSquares();
+      messageDiv.text = "Player $mainBoardWinner wins!";
       return;
     }
   }
