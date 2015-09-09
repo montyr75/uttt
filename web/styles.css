@@ -34,7 +34,7 @@ html, body {
 .little-square {
     width: 66px;
     height: 66px;
-    border: solid thin black;
+    border: solid thin darkgray;
     box-sizing: border-box;
 }
 
