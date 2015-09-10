@@ -5,7 +5,6 @@
 html, body {
   width: 100vw;
   height: 100vh;
-  font-size: 1.5em;
   font-family: 'Roboto', sans-serif;
   color: black;
   background-color: white;
@@ -22,7 +21,7 @@ html, body {
 }
 
 #message {
-  font-size: 0.8em;
+  font-size: 22px;
 }
 
 #main-board {
@@ -34,6 +33,7 @@ html, body {
 .main-square {
   width: 150px;
   height: 150px;
+  font-size: 120px;
   border: solid thin black;
   box-sizing: border-box;
 }
@@ -41,16 +41,13 @@ html, body {
 .little-square {
   width: 49px;
   height: 49px;
+  font-size: 38px;
   border: solid thin darkgray;
   box-sizing: border-box;
 }
 
 .available-square {
   background-color: lightblue;
-}
-
-.main-mark {
-  font-size: 3em;
 }
 
 /***********/

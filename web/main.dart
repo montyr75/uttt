@@ -1,18 +1,33 @@
 import 'dart:html';
 import 'dart:async';
 
-TTTBoard mainBoard;               // the large TTT board
-List<TTTBoard> littleBoards;      // a list of all 9 small TTT boards
-String currentPlayer;             // "X" or "O"
-List<int> availableMainSquares;   // main squares available for next move
+TTTBoard mainBoard; // the large TTT board
+List<TTTBoard> littleBoards; // a list of all 9 small TTT boards
+String currentPlayer; // "X" or "O"
+List<int> availableMainSquares; // main squares available for next move
 Map<DivElement, StreamSubscription> availableLittleSquares;
 
+DivElement mainBoardDiv = querySelector("#main-board");
 DivElement messageDiv = querySelector("#message");
 
 void main() {
   querySelector("#new-game-btn").onClick.listen(newGame);
   newGame();
 }
+
+DivElement getMainSquareDiv(int mainSquare) =>
+    querySelector('.main-square[data-square="$mainSquare"]');
+
+DivElement getLittleSquareDiv(int mainSquare, int littleSquare) => querySelector(
+    '.main-square[data-square="$mainSquare"] > [data-square="$littleSquare"]');
+
+bool toggleHighlight(DivElement squareDiv) =>
+    squareDiv.classes.toggle("available-square");
+
+String markSquare(DivElement squareDiv, String player) =>
+    squareDiv.text = player;
+
+String showMessage(String msg) => messageDiv.text = msg;
 
 void newGame([MouseEvent event]) {
   mainBoard = new TTTBoard();
@@ -26,17 +41,25 @@ void newGame([MouseEvent event]) {
 }
 
 void createBoard() {
-  DivElement mainBoardDiv = querySelector("#main-board")..children.clear();
+  mainBoardDiv.children.clear();
+
+  List<String> layoutClasses = [
+    "layout",
+    "horizontal",
+    "center",
+    "center-justified"
+  ];
+
   for (int mainSquare = 0; mainSquare < 9; mainSquare++) {
     DivElement mainSquareDiv = new DivElement()
-      ..classes.addAll(["main-square", "layout", "horizontal", "center", "center-justified", "wrap"])
+      ..classes.addAll(["main-square", "wrap"]..addAll(layoutClasses))
       ..attributes['data-square'] = mainSquare.toString();
 
     mainBoardDiv.append(mainSquareDiv);
 
     for (int littleSquare = 0; littleSquare < 9; littleSquare++) {
       mainSquareDiv.append(new DivElement()
-        ..classes.addAll(["little-square", "layout", "horizontal", "center", "center-justified"])
+        ..classes.addAll(["little-square"]..addAll(layoutClasses))
         ..attributes['data-square'] = littleSquare.toString());
     }
   }
@@ -47,15 +70,11 @@ void nextTurn([int lastLittleSquare]) {
   currentPlayer = currentPlayer == "X" ? "O" : "X";
   messageDiv.text = "Player: $currentPlayer";
 
-  findAvailableSquares(lastLittleSquare);
-}
-
-void findAvailableSquares([int lastLittleSquare]) {
   // figure out which main squares are available
-  availableMainSquares.clear();
-
-  if (lastLittleSquare != null && mainBoard[lastLittleSquare] == null) {
-    availableMainSquares.add(lastLittleSquare);
+  if (lastLittleSquare != null &&
+      mainBoard[lastLittleSquare] == null &&
+      littleBoards[lastLittleSquare].isNotFull) {
+    availableMainSquares = [lastLittleSquare];
   }
   else {
     availableMainSquares = mainBoard.emptySquares;
@@ -63,20 +82,12 @@ void findAvailableSquares([int lastLittleSquare]) {
 
   // find, save, and highlight all available little squares
   for (int mainSquare in availableMainSquares) {
-    List<int> littleSquares = littleBoards[mainSquare].emptySquares;
-
-    for (int littleSquare in littleSquares) {
+    for (int littleSquare in littleBoards[mainSquare].emptySquares) {
       DivElement squareDiv = getLittleSquareDiv(mainSquare, littleSquare);
-      squareDiv.classes.toggle("available-square");
-      availableLittleSquares[squareDiv] = squareDiv.onClick.listen(
-        (MouseEvent event) => move(mainSquare, littleSquare)
-      );
+      toggleHighlight(squareDiv);
+      availableLittleSquares[squareDiv] = squareDiv.onClick
+          .listen((MouseEvent event) => move(mainSquare, littleSquare));
     }
-  }
-
-  // if the player has nowhere to move, he/she can move anywhere
-  if (availableLittleSquares.isEmpty) {
-    findAvailableSquares();
   }
 }
 
@@ -84,32 +95,31 @@ void move(int mainSquare, int littleSquare) {
   // remove click listeners from last turn
   availableLittleSquares
     ..forEach((DivElement squareDiv, StreamSubscription listener) {
-        squareDiv.classes.toggle("available-square");
-        listener.cancel();
+      toggleHighlight(squareDiv);
+      listener.cancel();
     })
     ..clear();
 
-  // mark the square
-  getLittleSquareDiv(mainSquare, littleSquare).text = currentPlayer;
+  markSquare(getLittleSquareDiv(mainSquare, littleSquare), currentPlayer);
 
   // make the move
-  String littleBoardWinner = littleBoards[mainSquare].move(littleSquare, currentPlayer);
+  String littleBoardWinner =
+      littleBoards[mainSquare].move(littleSquare, currentPlayer);
 
   // if there is a win on a little board, make a move on the main board
   if (littleBoardWinner != null) {
     String mainBoardWinner = mainBoard.move(mainSquare, littleBoardWinner);
 
-    DivElement mainSquareDiv = getMainSquareDiv(mainSquare);
-    mainSquareDiv.children.clear();
-    mainSquareDiv.appendHtml('<span class="main-mark">$littleBoardWinner</span>');
+    markSquare(
+        getMainSquareDiv(mainSquare)..children.clear(), littleBoardWinner);
 
     // check for win or tie on main board
     if (mainBoardWinner != null) {
-      messageDiv.text = "Player $mainBoardWinner wins!";
+      showMessage("Player $mainBoardWinner wins!");
       return;
     }
-    else if (mainBoard._moveCount >= 9) {
-      messageDiv.text = "It's a tie!";
+    else if (mainBoard.isFull) {
+      showMessage("It's a tie!");
       return;
     }
   }
@@ -117,25 +127,17 @@ void move(int mainSquare, int littleSquare) {
   nextTurn(littleSquare);
 }
 
-DivElement getMainSquareDiv(int mainSquare) {
-  return querySelector('.main-square[data-square="$mainSquare"]');
-}
-
-DivElement getLittleSquareDiv(int mainSquare, int littleSquare) {
-  return querySelector('.main-square[data-square="$mainSquare"] > [data-square="$littleSquare"]');
-}
-
 class TTTBoard {
   // win patterns
   static const List<List<int>> WIN_PATTERNS = const [
-    const [0, 1, 2],  // row 1
-    const [3, 4, 5],  // row 2
-    const [6, 7, 8],  // row 3
-    const [0, 3, 6],  // col 1
-    const [1, 4, 7],  // col 2
-    const [2, 5, 8],  // col 3
-    const [0, 4, 8],  // diag 1
-    const [2, 4, 6]   // diag 2
+    const [0, 1, 2], // row 1
+    const [3, 4, 5], // row 2
+    const [6, 7, 8], // row 3
+    const [0, 3, 6], // col 1
+    const [1, 4, 7], // col 2
+    const [2, 5, 8], // col 3
+    const [0, 4, 8], // diag 1
+    const [2, 4, 6] // diag 2
   ];
 
   List<String> _board;
@@ -148,10 +150,10 @@ class TTTBoard {
   String move(int square, String player) {
     _board[square] = player;
     _moveCount++;
-    return checkWin();
+    return getWinner();
   }
 
-  String checkWin() {
+  String getWinner() {
     for (List<int> winPattern in WIN_PATTERNS) {
       String square1 = _board[winPattern[0]];
       String square2 = _board[winPattern[1]];
@@ -167,6 +169,9 @@ class TTTBoard {
     return null;
   }
 
+  bool get isFull => _moveCount >= 9;
+  bool get isNotFull => !isFull;
+
   List<int> get emptySquares {
     List<int> empties = [];
 
@@ -178,8 +183,6 @@ class TTTBoard {
 
     return empties;
   }
-
-  int get moveCount => _moveCount;
 
   String operator [](int square) => _board[square];
 
