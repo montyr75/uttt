@@ -128,7 +128,6 @@ void move(int mainSquare, int littleSquare) {
 }
 
 class TTTBoard {
-  // win patterns
   static const List<List<int>> WIN_PATTERNS = const [
     const [0, 1, 2], // row 1
     const [3, 4, 5], // row 2
@@ -137,7 +136,7 @@ class TTTBoard {
     const [1, 4, 7], // col 2
     const [2, 5, 8], // col 3
     const [0, 4, 8], // diag 1
-    const [2, 4, 6] // diag 2
+    const [2, 4, 6]  // diag 2
   ];
 
   List<String> _board;
@@ -145,12 +144,6 @@ class TTTBoard {
 
   TTTBoard() {
     _board = new List<String>.filled(9, null);
-  }
-
-  String move(int square, String player) {
-    _board[square] = player;
-    _moveCount++;
-    return getWinner();
   }
 
   String getWinner() {
@@ -167,6 +160,12 @@ class TTTBoard {
 
     // if we get here, there is no win
     return null;
+  }
+
+  String move(int square, String player) {
+    _board[square] = player;
+    _moveCount++;
+    return getWinner();
   }
 
   bool get isFull => _moveCount >= 9;
