@@ -1,5 +1,5 @@
 import 'dart:html';
-import 'dart:async';
+import 'dart:async' show StreamSubscription;
 
 TTTBoard mainBoard; // the large TTT board
 List<TTTBoard> littleBoards; // a list of all 9 small TTT boards
