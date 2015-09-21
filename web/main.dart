@@ -186,12 +186,12 @@ class TTTBoard {
   String operator [](int square) => _board[square];
 
   @override String toString() {
-    String mark(int square) => _board[square] ?? " ";
+    String prettify(int square) => _board[square] ?? " ";
 
     return """
-${mark(0)} | ${mark(1)} | ${mark(2)}
-${mark(3)} | ${mark(4)} | ${mark(5)}
-${mark(6)} | ${mark(7)} | ${mark(8)}
+${prettify(0)} | ${prettify(1)} | ${prettify(2)}
+${prettify(3)} | ${prettify(4)} | ${prettify(5)}
+${prettify(6)} | ${prettify(7)} | ${prettify(8)}
     """;
   }
 }
