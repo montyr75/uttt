@@ -68,7 +68,7 @@ void createBoard() {
 void nextTurn([int lastLittleSquare]) {
   // toggle current player
   currentPlayer = currentPlayer == "X" ? "O" : "X";
-  messageDiv.text = "Player: $currentPlayer";
+  showMessage("Player: $currentPlayer");
 
   // figure out which main squares are available
   if (lastLittleSquare != null &&
@@ -100,16 +100,14 @@ void move(int mainSquare, int littleSquare) {
     })
     ..clear();
 
-  markSquare(getLittleSquareDiv(mainSquare, littleSquare), currentPlayer);
-
   // make the move
   String littleBoardWinner =
       littleBoards[mainSquare].move(littleSquare, currentPlayer);
+  markSquare(getLittleSquareDiv(mainSquare, littleSquare), currentPlayer);
 
   // if there is a win on a little board, make a move on the main board
   if (littleBoardWinner != null) {
     String mainBoardWinner = mainBoard.move(mainSquare, littleBoardWinner);
-
     markSquare(
         getMainSquareDiv(mainSquare)..children.clear(), littleBoardWinner);
 
