@@ -18,8 +18,9 @@ void main() {
 DivElement getMainSquareDiv(int mainSquare) =>
     querySelector('.main-square[data-square="$mainSquare"]');
 
-DivElement getLittleSquareDiv(int mainSquare, int littleSquare) => querySelector(
-    '.main-square[data-square="$mainSquare"] > [data-square="$littleSquare"]');
+DivElement getLittleSquareDiv(int mainSquare, int littleSquare) =>
+    querySelector('.main-square[data-square="$mainSquare"] >'
+        '[data-square="$littleSquare"]');
 
 bool toggleHighlight(DivElement squareDiv) =>
     squareDiv.classes.toggle("available-square");
@@ -43,7 +44,7 @@ void newGame([MouseEvent event]) {
 void createBoard() {
   mainBoardDiv.children.clear();
 
-  List<String> layoutClasses = [
+  final List<String> layout = [
     "layout",
     "horizontal",
     "center",
@@ -52,14 +53,14 @@ void createBoard() {
 
   for (int mainSquare = 0; mainSquare < 9; mainSquare++) {
     DivElement mainSquareDiv = new DivElement()
-      ..classes.addAll(["main-square", "wrap"]..addAll(layoutClasses))
+      ..classes.addAll(["main-square", "wrap"]..addAll(layout))
       ..attributes['data-square'] = mainSquare.toString();
 
     mainBoardDiv.append(mainSquareDiv);
 
     for (int littleSquare = 0; littleSquare < 9; littleSquare++) {
       mainSquareDiv.append(new DivElement()
-        ..classes.addAll(["little-square"]..addAll(layoutClasses))
+        ..classes.addAll(["little-square"]..addAll(layout))
         ..attributes['data-square'] = littleSquare.toString());
     }
   }
@@ -151,7 +152,9 @@ class TTTBoard {
       String square3 = _board[winPattern[2]];
 
       // if all three squares match and aren't empty, there's a win
-      if (square1 != null && square1 == square2 && square2 == square3) {
+      if (square1 != null &&
+          square1 == square2 &&
+          square2 == square3) {
         return square1;
       }
     }
