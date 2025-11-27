@@ -1,5 +1,6 @@
 import 'package:awesome_flutter_extensions/awesome_flutter_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../utils/screen_utils.dart';
@@ -50,28 +51,29 @@ class SmallBoardWidget extends ConsumerWidget {
                   ),
                 ],
               ),
-            ),
+            ).animate().fadeIn(duration: 300.ms),
           ),
         ),
       );
     }
 
-    return Container(
+    final playerColor = gameState.currentPlayer.getColor(context);
+
+    return AnimatedContainer(
+      duration: 300.ms,
       decoration: BoxDecoration(
         border: Border.all(
-          color: canPlay ? colorScheme.primary : colorScheme.primary.withValues(alpha: 0.3),
+          color: canPlay ? playerColor : colorScheme.primary.withValues(alpha: 0.3),
           width: canPlay ? 2 : 1,
         ),
-        color: canPlay ? colorScheme.primary.withValues(alpha: 0.05) : null,
-        boxShadow: canPlay
-            ? [
-                BoxShadow(
-                  color: colorScheme.primary.withValues(alpha: 0.5),
-                  blurRadius: 10,
-                  spreadRadius: 1,
-                ),
-              ]
-            : null,
+        color: canPlay ? colorScheme.primary.withValues(alpha: 0.05) : Colors.transparent,
+        boxShadow: [
+          BoxShadow(
+            color: canPlay ? colorScheme.primary.withValues(alpha: 0.5) : Colors.transparent,
+            blurRadius: canPlay ? 10 : 0,
+            spreadRadius: canPlay ? 1 : 0,
+          ),
+        ],
       ),
       child: GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
@@ -99,7 +101,7 @@ class SmallBoardWidget extends ConsumerWidget {
               child: cell == null
                   ? null
                   : Padding(
-                      padding: const EdgeInsets.all(4.0),
+                      padding: paddingAllS,
                       child: FittedBox(
                         fit: BoxFit.contain,
                         child: Text(
@@ -115,7 +117,7 @@ class SmallBoardWidget extends ConsumerWidget {
                               ),
                             ],
                           ),
-                        ),
+                        ).animate().fadeIn(duration: 200.ms),
                       ),
                     ),
             ),
