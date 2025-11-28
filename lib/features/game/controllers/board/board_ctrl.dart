@@ -14,12 +14,8 @@ class BoardCtrl extends _$BoardCtrl {
     );
   }
 
-  void makeMove(int cellIndex, Player player) {
-    if (state.cells[cellIndex] != null || state.winner != null) {
-      return;
-    }
-
-    final newCells = List<Player?>.from(state.cells);
+  BoardState makeMove(int cellIndex, Player player) {
+    final newCells = state.cells.toList();
     newCells[cellIndex] = player;
 
     final winner = _checkWin(newCells);
@@ -28,6 +24,8 @@ class BoardCtrl extends _$BoardCtrl {
       cells: newCells,
       winner: winner,
     );
+
+    return state;
   }
 
   Player? _checkWin(List<Player?> cells) {

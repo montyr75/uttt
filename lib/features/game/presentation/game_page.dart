@@ -75,7 +75,7 @@ class GamePage extends ConsumerWidget {
   Widget _buildStatusText(BuildContext context, GameState state) {
     final styles = context.textStyles;
 
-    if (state.isGameDrawn) {
+    if (state.isDrawn) {
       return FittedBox(
         fit: BoxFit.scaleDown,
         child: Text(
@@ -94,16 +94,16 @@ class GamePage extends ConsumerWidget {
       );
     }
     
-    if (state.isGameWon) {
+    if (state.isWon) {
       return FittedBox(
         fit: BoxFit.scaleDown,
         child: Text(
-          'Player ${state.winner!.toString()} Wins!',
+          'Player ${state.winner!.player.toString()} Wins!',
           style: styles.headlineLarge.copyWith(
-            color: state.winner!.getColor(context),
+            color: state.winner!.player.getColor(context),
             shadows: [
               BoxShadow(
-                color: state.winner!.getColor(context),
+                color: state.winner!.player.getColor(context),
                 blurRadius: 20,
                 spreadRadius: 2,
               ),

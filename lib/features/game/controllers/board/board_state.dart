@@ -14,5 +14,9 @@ class BoardState {
   }
   
   bool get isFull => cells.every((cell) => cell != null);
-  bool get isBoardWon => winner != null;
+  bool get isWon => winner != null;
+  bool get isDrawn => !isWon && isFull;
+  bool get isAvailable => !isWon && !isFull;
+  
+  bool isCellAvailable(int index) => !isWon && !isFull && cells[index] == null;
 }

@@ -14,57 +14,35 @@ class GameCtrl extends _$GameCtrl {
   }
 
   void makeMove(int boardIndex, int cellIndex) {
-    // 1. Validate turn
-    if (state.winner != null) {
-      return;
-    }
-
-    // Check if the move is in the correct board
-    if (state.nextBoardIndex != null && state.nextBoardIndex != boardIndex) {
-      // However, we must handle the case where we were sent to a won/full board.
-      // But the logic below handles setting nextBoardIndex to null if that happens.
-      // So if nextBoardIndex is NOT null, we MUST play there.
-      return;
-    }
-
-    final boardCtrl = ref.read(boardCtrlProvider(boardIndex).notifier);
-    final boardState = ref.read(boardCtrlProvider(boardIndex));
-
-    // Check if cell is empty
-    if (boardState.cells[cellIndex] != null) {
-      return;
-    }
-
-    // Check if board is already won
-    if (boardState.winner != null) {
-      return;
-    }
-
-    // 2. Make the move on the small board
-    boardCtrl.makeMove(cellIndex, state.currentPlayer);
+    // Make the move on the small board
+    ref.read(boardCtrlProvider(boardIndex).notifier).makeMove(cellIndex, state.currentPlayer);
 
     // Refresh board state after move
     final newBoardState = ref.read(boardCtrlProvider(boardIndex));
 
-    // 3. Update large board state if this small board was just won
+    // Update large board state if this small board was just won or drawn
     final newLargeBoardState = Map<int, Player>.from(state.largeBoardState);
-    if (newBoardState.isBoardWon && !state.largeBoardState.containsKey(boardIndex)) {
+    final newDrawnBoards = Set<int>.from(state.drawnBoards);
+
+    if (newBoardState.isWon && !state.largeBoardState.containsKey(boardIndex)) {
       newLargeBoardState[boardIndex] = newBoardState.winner!;
+    } else if (newBoardState.isDrawn && !state.drawnBoards.contains(boardIndex)) {
+      newDrawnBoards.add(boardIndex);
     }
 
-    // 4. Check for global win
+    // Check for global win
     final winner = _checkGlobalWin(newLargeBoardState);
 
-    // 5. Determine next board index
+    // Determine next board index
     int? nextBoardIndex = cellIndex;
 
     // Check if the target board is already won or full
     final targetBoardState = ref.read(boardCtrlProvider(nextBoardIndex));
-    if (targetBoardState.winner != null || targetBoardState.isFull) {
+    if (targetBoardState.isWon || targetBoardState.isDrawn) {
       nextBoardIndex = null; // Free choice
     }
 
-    // 6. Switch player
+    // Switch player
     final nextPlayer = state.currentPlayer == Player.x ? Player.o : Player.x;
 
     state = state.copyWith(
@@ -72,6 +50,7 @@ class GameCtrl extends _$GameCtrl {
       nextBoardIndex: nextBoardIndex,
       winner: winner,
       largeBoardState: newLargeBoardState,
+      drawnBoards: newDrawnBoards,
     );
   }
 
@@ -85,14 +64,14 @@ class GameCtrl extends _$GameCtrl {
     state = const GameState();
   }
 
-  Player? _checkGlobalWin(Map<int, Player> largeBoard) {
+  ({Player player, List<int> pattern})? _checkGlobalWin(Map<int, Player> largeBoard) {
     for (final pattern in winPatterns) {
       final a = largeBoard[pattern[0]];
       final b = largeBoard[pattern[1]];
       final c = largeBoard[pattern[2]];
 
       if (a != null && a == b && a == c) {
-        return a;
+        return (player: a, pattern: pattern);
       }
     }
 

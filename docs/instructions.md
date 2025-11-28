@@ -1,13 +1,19 @@
-# Ultimate Tic-Tac-Toe
+# Welcome to Ultimate Tic-Tac-Toe! 🎮
 
-Ultimate Tic-Tac-Toe is a variant of Tic-Tac-Toe where players take turns marking spaces in a 3x3 grid of smaller 3x3 Tic-Tac-Toe boards. The game is played on a large Tic-Tac-Toe board, with each square containing a smaller Tic-Tac-Toe board. The objective of the game is to win three of your symbols in a row on the large board. The game is for two players, X and O, who take turns marking spaces in the small boards.
+Get ready for a strategic twist on the classic game! Ultimate Tic-Tac-Toe is played on a massive 3x3 grid, where each square is its *own* smaller Tic-Tac-Toe board.
+
+**The Goal:** Win three small boards in a row (horizontally, vertically, or diagonally) to claim victory on the main board!
 
 ## How to Play
-*   **First move**: The first player can choose any small square on any of the nine small Tic-Tac-Toe boards.
-*   **Subsequent moves**: Your opponent must play in the small board that corresponds to the position of your last move. For example, if you play in the top-left square of any board, your opponent must play in the top-left board.
-*   **Winning a small board**: When you get three of your symbols in a row on a small board, you win that board. That entire square is marked with your symbol, and the small board is removed from the game.
-*   **Winning the game**: The first player to get three of their symbols in a row on the large Tic-Tac-Toe board wins the game.
 
-## Special Cases
-*   **Sent to a won board**: If you are directed to a board that has already been won, you are allowed to play in any available square on any board.
-*   **Sent to a full board**: If a small board is full (a tie), the player who is sent to that board can play in any open square.
+*   **Start the Game:** Player X goes first and can place their mark in **any** open square on **any** of the nine small boards.
+*   **The Golden Rule:** Your move determines where your opponent plays next!
+    *   *Example:* If you place your mark in the **top-right** square of a small board, your opponent *must* make their next move somewhere in the **top-right** small board.
+*   **Winning a Board:** Get three of your symbols in a row on a small board to win it. That entire board becomes yours and is marked with your big symbol.
+
+## Special Situations
+
+*   **Free Move:** If you are sent to a board that has already been won or is completely full, you get a **Free Move**! This means you can play in any open square on any active board.
+*   **Draws:** If a small board fills up without a winner, it counts as a tie for that specific board.
+
+Think ahead, block your opponent, and conquer the grid!
